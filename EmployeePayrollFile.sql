@@ -53,3 +53,66 @@ select gender,min(salary) as MinSalary from Employee_payroll group by(gender);
 
 
 select gender,count(*) as TotalPerson from Employee_payroll group by gender;
+
+-- uc-8
+
+ALTER TABLE Employee_payroll add phoneNumber varchar(30) ;
+ALTER TABLE Employee_payroll add address varchar(200) default 'AP' not null;
+ALTER TABLE Employee_payroll add department  varchar(30) default 'TBA' NOT NULL ;
+EXEC sp_RENAME 'Employee_payroll.gender', 'Gender', 'COLUMN';
+EXEC sp_RENAME 'Employee_payroll.salary', 'basicPay', 'COLUMN';
+
+SELECT name FROM master.sys.databases
+
+--UC9 Adding deductions,taxable pay ,tax and net_pay to existing table
+alter table Employee_payroll add deductions decimal(10,3) NOT NULL default 0;
+
+alter table Employee_payroll add taxable_pay decimal(10,3) NOT NULL default 0 ;
+
+alter table Employee_payroll add tax decimal(10,3) NOT NULL default 0;
+
+alter table Employee_payroll add net_pay decimal(10,3) NOT NULL default 0;
+
+select * from Employee_payroll;
+
+
+--UC 10 adding terissa as a part of sales and marketing department
+insert into Employee_payroll values ('Terissa',90000,'2015-07-09','F',NULL,NULL,'SALES',0,0,0,0);
+insert into Employee_payroll values ('Terissa',90000,'2015-07-09','F',NULL,NULL,'MARKETING',0,0,0,0);
+
+select * from Employee_payroll;
+
+--UC 11 create a new table employee department and department table
+
+create table DEPARTMENT(DeptId int primary key,DeptName varchar(100));
+
+
+select * from DEPARTMENT;
+INSERT INTO DEPARTMENT VALUES(7,'SALES');
+INSERT INTO DEPARTMENT VALUES(8,'MARKETING');
+INSERT INTO DEPARTMENT VALUES(9,'BUSINESS');
+
+
+create table Employee_department (id int, DeptId int ,Primary key(id,DeptId));
+
+insert into Employee_department values(7,111);
+insert into Employee_department values(8,111);
+insert into Employee_department values(9,222);
+
+select * from Employee_department;
+
+select * from Employee_payroll;
+
+select EP.name,D.DeptName from 
+Employee_payroll EP inner join Employee_department ED on EP.id=ED.id 
+ inner join DEPARTMENT D on ED.DeptId=D.DeptId ;
+
+ --UC12 Ensure all the operations working fine
+
+select EP.name,EP.basicPay,EP.start_Date,EP.Gender,
+EP.phoneNumber,EP.address,EP.deductions,
+EP.taxable_pay,EP.tax,EP.net_pay,D.DeptName from 
+Employee_payroll EP inner join Employee_department ED on EP.id=ED.id 
+ inner join DEPARTMENT D on ED.DeptId=D.DeptId where D.DeptName='SALES';
+
+ select * from Employee_payroll;
